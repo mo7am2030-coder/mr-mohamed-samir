@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>لوحة التحكم | منصة الأستاذ محمد</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <style>
+    /* Inline overrides for responsive dashboards */
+    .dashboard-grid-box {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+    .custom-card {
+      background: var(--surface);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+    }
+  </style>
+</head>
+<body class="dashboard-body">
+
+  <!-- ===== PARTICLES ===== -->
+  <canvas id="particles-canvas"></canvas>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <!-- ===== DASHBOARD WRAPPER ===== -->
+  <div class="dashboard-wrapper">
+
+    <!-- ===== SIDEBAR ===== -->
+    <aside class="sidebar" id="dashboard-sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo-icon">🎓</div>
+        <div class="sidebar-logo-text">
+          <span class="sidebar-logo-name">Mr. Mohamed</span>
+          <span class="sidebar-logo-sub">English Platform</span>
+        </div>
+      </div>
+      
+      <!-- DYNAMIC SIDEBAR MENU (Injected by JS) -->
+      <nav class="sidebar-menu" id="sidebar-nav-menu">
+        <!-- JS will inject menu items based on role -->
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="menu-item" id="btn-logout" style="color: var(--danger);">
+          <span class="menu-item-icon">🚪</span>
+          <span id="lbl-logout">تسجيل الخروج</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="main-content">
+      
+      <!-- Header -->
+      <header class="dashboard-header">
+        <div class="header-left">
+          <button class="sidebar-toggle" id="sidebar-hamburger" aria-label="Toggle Sidebar">☰</button>
+          <h1 class="header-title" id="dashboard-panel-title">لوحة التحكم الرئيسيّة</h1>
+        </div>
+
+        <div class="header-right">
+          <!-- Theme Toggle -->
+          <button class="theme-btn" id="theme-toggle" aria-label="تغيير المظهر">🌓</button>
+          <!-- Language Switcher -->
+          <button class="lang-btn" id="lang-toggle" data-lang="ar">EN</button>
+          
+          <!-- Profile Widget -->
+          <div class="user-profile-widget">
+            <span class="user-avatar" id="header-user-avatar">👨‍🎓</span>
+            <span class="user-name" id="header-user-name">طالب تجريبي</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- Content Area -->
+      <div class="dashboard-body-content">
+        
+        <!-- ===================================================== -->
+        <!-- ===== PANEL: OVERVIEW ===== -->
+        <!-- ===================================================== -->
+        <div class="panel active" id="panel-overview">
+          <div class="stats-grid" id="overview-stats-grid">
+            <!-- Dynamic stats card will be injected here by JS -->
+          </div>
+
+          <div class="dashboard-split">
+            <!-- Left Side: Main Section -->
+            <div>
+              <div class="custom-card" style="margin-bottom: 24px;">
+                <div class="card-title-bar">
+                  <h2 id="lbl-panel-welcome">👋 أهلاً بك مجدداً في لوحتك!</h2>
+                </div>
+                <p style="color: var(--text-muted); line-height: 1.7;" id="lbl-panel-welcome-desc">
+                  هذه هي لوحة تحكمك الشخصية. يمكنك متابعة تقدمك الدراسي، حضور الدروس الجديدة، تقديم الواجبات، والمزيد من هنا.
+                </p>
+              </div>
+
+              <!-- Content specific to role (e.g. My courses / active tasks / child reports) -->
+              <div id="overview-role-content"></div>
+            </div>
+
+            <!-- Right Side: Announcements / Notifications -->
+            <div>
+              <div class="custom-card">
+                <div class="card-title-bar">
+                  <h2 id="lbl-announcements-title">📢 أحدث الإعلانات</h2>
+                </div>
+                <div id="overview-announcements">
+                  <!-- Announcements injected by JS -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===================================================== -->
+        <!-- ===== PANEL: COURSES ===== -->
+        <!-- ===================================================== -->
+        <div class="panel" id="panel-courses">
+          <div class="card-title-bar" style="margin-bottom: 24px;">
+            <h2 id="lbl-courses-header">📚 المناهج والكورسات</h2>
+            <div id="courses-action-area">
+              <!-- Dynamic add buttons (Teacher/Admin) -->
+            </div>
+          </div>
+          <div class="course-list-grid" id="courses-grid-container">
+            <!-- Injected courses -->
+          </div>
+        </div>
+
+        <!-- ===================================================== -->
+        <!-- ===== PANEL: EXAMS ===== -->
+        <!-- ===================================================== -->
+        <div class="panel" id="panel-exams">
+          <div class="card-title-bar" style="margin-bottom: 24px;">
+            <h2 id="lbl-exams-header">✏️ الاختبارات والامتحانات</h2>
+            <div id="exams-action-area">
+              <!-- Admin/Teacher Question builder button -->
+            </div>
+          </div>
+          <div class="table-responsive custom-card">
+            <table class="data-table">
+              <thead>
+                <tr id="tbl-exams-head">
+                  <th>الامتحان</th>
+                  <th>المستوى</th>
+                  <th>الأسئلة</th>
+                  <th>المدة</th>
+                  <th>الدرجة</th>
+                  <th>الإجراء</th>
+                </tr>
+              </thead>
+              <tbody id="exams-table-body">
+                <!-- Injected exam list -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ===================================================== -->
+        <!-- ===== PANEL: CHAT ===== -->
+        <!-- ===================================================== -->
+        <div class="panel" id="panel-chat">
+          <div class="chat-container">
+            <!-- Users list -->
+            <div class="chat-sidebar">
+              <div class="chat-search-wrap">
+                <input type="text" class="form-input" id="chat-user-search" placeholder="بحث عن مستخدم..." />
+              </div>
+              <div class="chat-users-list" id="chat-list-container">
+                <!-- Injected users list -->
+              </div>
+            </div>
+            
+            <!-- Chat window -->
+            <div class="chat-main">
+              <div class="chat-main-header">
+                <div class="chat-user-avatar" id="active-chat-avatar">💬</div>
+                <div>
+                  <div class="chat-user-name" id="active-chat-name">اختر جهة اتصال لبدء المحادثة</div>
+                  <div style="font-size: 0.7rem; color: var(--success);" id="active-chat-status"></div>
+                </div>
+              </div>
+              <div class="chat-messages-area" id="chat-msg-container">
+                <!-- Messages will load here -->
+              </div>
+              <div class="chat-input-area">
+                <input type="text" class="form-input" id="chat-input-msg" placeholder="اكتب رسالة هنا..." disabled />
+                <button class="btn btn-primary" id="btn-send-msg" disabled>إرسال</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===================================================== -->
+        <!-- ===== PANEL: AI ASSISTANT ===== -->
+        <!-- ===================================================== -->
+        <div class="panel" id="panel-ai">
+          <div class="card-title-bar" style="margin-bottom: 20px;">
+            <h2 id="lbl-ai-header">🎤 مساعد الإنجليزي الذكي (AI Assistant)</h2>
+          </div>
+
+          <!-- AI Sub-tabs -->
+          <div class="ai-tabs" id="ai-subtabs-bar">
+            <button class="tab-btn active" data-subpanel="ai-dialog" id="btn-subtab-dialog">💬 المحادثة والطلاقة (Dialogue)</button>
+            <button class="tab-btn" data-subpanel="ai-writing-coach" id="btn-subtab-coach">📝 مدرب الكتابة والقواعد (Writing Coach)</button>
+            <button class="tab-btn" data-subpanel="ai-pronounce-trainer" id="btn-subtab-pronounce">🗣️ مدرب النطق الصحيح (Pronunciation)</button>
+            <button class="tab-btn" data-subpanel="ai-personalized" id="btn-subtab-recommends">🎯 التوصيات ومفردات اليوم (Recommendations)</button>
+          </div>
+
+          <!-- SUBPANEL: Dialogue Simulator -->
+          <div class="ai-subpanel active" id="subpanel-ai-dialog">
+            <div style="margin-bottom: 20px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
+              <span style="font-size:0.85rem; font-weight:700; color:var(--text-muted);" id="lbl-dialog-topic-select">اختر موضوع المحادثة:</span>
+              <select id="ai-dialog-topic" class="form-select" style="max-width: 250px; padding: 8px 12px;">
+                <option value="intro" selected>👋 التعارف الشخصي (Self-Introduction)</option>
+                <option value="cafe">☕ طلب القهوة والطعام (Ordering at a Cafe)</option>
+                <option value="travel">✈️ في المطار والجمارك (At the Airport)</option>
+                <option value="interview">💼 مقابلة عمل تجريبية (Job Mock Interview)</option>
+              </select>
+              <button class="btn btn-ghost" id="btn-restart-dialog" style="padding: 8px 16px; font-size: 0.82rem;">🔄 إعادة البدء</button>
+            </div>
+            
+            <div class="ai-assistant-card" style="height: 420px;">
+              <div class="ai-messages-area" id="ai-dialog-messages">
+                <!-- Dialogue messages will load here -->
+              </div>
+              <div class="chat-input-area">
+                <input type="text" class="form-input" id="ai-dialog-input" placeholder="تحدث أو اكتب إجابتك بالإنجليزية..." />
+                <button class="btn btn-primary" id="btn-send-dialog-msg">إرسال</button>
+                <button class="btn btn-gold" id="btn-mic-dialog-msg" title="التحدث بالصوت">🎤</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- SUBPANEL: Grammar & Essay Coach -->
+          <div class="ai-subpanel" id="subpanel-ai-writing-coach">
+            <div class="dashboard-split">
+              <!-- Quick Grammar Corrector -->
+              <div class="custom-card">
+                <h3 style="font-size: 1rem; font-weight: 800; margin-bottom: 16px;" id="lbl-quick-grammar-title">⚡ مصحح القواعد السريع</h3>
+                <div class="form-group">
+                  <textarea id="ai-grammar-text" class="form-textarea" style="height: 120px;" placeholder="اكتب جملة بالإنجليزية مثل: She go to school yesterday..."></textarea>
+                </div>
+                <button class="btn btn-primary" id="btn-check-grammar" style="width: 100%; justify-content: center;">🔍 فحص وتدقيق القواعد</button>
+                
+                <div id="ai-grammar-result-area" style="margin-top: 20px; display: none;">
+                  <!-- Injected check result card -->
+                </div>
+              </div>
+
+              <!-- Essay Writing Feedback -->
+              <div class="custom-card">
+                <h3 style="font-size: 1rem; font-weight: 800; margin-bottom: 16px;" id="lbl-essay-coach-title">📝 مدرب كتابة المقالات والفقرات</h3>
+                <div class="form-group">
+                  <span class="announce-tag" style="margin-bottom: 8px; display: inline-block;" id="lbl-essay-topic-badge">موضوع مقترح:</span>
+                  <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;" id="lbl-essay-suggested-topic">Write a paragraph (50-80 words) describing your last summer holiday and what you did.</p>
+                  <textarea id="ai-essay-text" class="form-textarea" style="height: 150px;" placeholder="اكتب فقرتك أو مقالك هنا بالإنجليزية لمراجعته بالكامل..."></textarea>
+                </div>
+                <button class="btn btn-gold" id="btn-check-essay" style="width: 100%; justify-content: center;">📝 تحليل الكتابة وتقييمها</button>
+              </div>
+            </div>
+
+            <!-- Injected Essay Feedback Report Card -->
+            <div id="ai-essay-report-area" style="display: none;">
+              <!-- Injected essay report -->
+            </div>
+          </div>
+
+          <!-- SUBPANEL: Pronunciation Trainer -->
+          <div class="ai-subpanel" id="subpanel-ai-pronounce-trainer">
+            <div class="dashboard-split" style="grid-template-columns: 1fr 1fr;">
+              <!-- Pronunciation Station -->
+              <div class="pr-station">
+                <div class="section-badge"><span id="lbl-pr-badge-text">تدريب المخارج والنطق</span></div>
+                <div class="pr-word" id="pr-target-word">Phenomenon</div>
+                <div class="pr-ipa" id="pr-target-ipa">/fəˈnɒmɪnən/</div>
+                
+                <div class="pr-score-ring" id="pr-score-border">
+                  <span class="pr-score-val" id="pr-score-percentage">--%</span>
+                  <span class="pr-score-lbl" id="lbl-pr-accuracy">الدقة والنطق</span>
+                </div>
+
+                <div class="pr-actions">
+                  <button class="btn btn-ghost" id="btn-pr-listen">🔊 استمع للنطق</button>
+                  <button class="btn btn-primary" id="btn-pr-speak">🎤 انطق الكلمة</button>
+                </div>
+                
+                <div id="pr-speech-text-feedback" style="margin-top: 20px; font-size: 0.85rem; color: var(--text-muted);">
+                  اضغط على الزر واستمع ثم انطق الكلمة في الميكروفون
+                </div>
+              </div>
+
+              <!-- Words Selection list -->
+              <div class="custom-card">
+                <h3 style="font-size: 1rem; font-weight: 800; margin-bottom: 16px;" id="lbl-pr-wordlist-title">📚 اختر كلمة للتدرب عليها:</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;" id="pr-words-grid">
+                  <!-- Word buttons injected here -->
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SUBPANEL: Personalized Recommendations -->
+          <div class="ai-subpanel" id="subpanel-ai-personalized">
+            <div class="dashboard-split">
+              <!-- Personalized learning recommendations -->
+              <div class="custom-card">
+                <h3 style="font-size: 1.05rem; font-weight: 800; margin-bottom: 16px;" id="lbl-recommends-title">🎯 خطة تعليمية مقترحة لك (Personalized plan)</h3>
+                <div style="display: flex; flex-direction: column; gap: 12px;" id="ai-recommends-list">
+                  <!-- Dynamic recommendation cards injected by JS -->
+                </div>
+              </div>
+
+              <!-- Vocabulary suggestions list -->
+              <div class="custom-card">
+                <h3 style="font-size: 1.05rem; font-weight: 800; margin-bottom: 16px;" id="lbl-ai-words-title">📚 مفردات مقترحة لمستواك الدراسي</h3>
+                <div style="display: flex; flex-direction: column; gap: 12px;" id="ai-vocab-list">
+                  <!-- Dynamic vocab list injected by JS -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===================================================== -->
+        <!-- ===== PANEL: GAMIFICATION ===== -->
+        <!-- ===================================================== -->
+        <div class="panel" id="panel-gamification">
+          <div class="card-title-bar" style="margin-bottom: 24px;">
+            <h2 id="lbl-gamification-header">🏆 لوحة الشرف ونقاطي</h2>
+          </div>
+
+          <div class="dashboard-split">
+            <!-- Leaderboard -->
+            <div class="custom-card">
+              <h3 style="font-size: 1.05rem; font-weight: 800; margin-bottom: 20px;" id="lbl-dash-leaderboard">🏆 المتصدرون الأسبوعيون</h3>
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th id="tbl-leader-rank">الترتيب</th>
+                      <th id="tbl-leader-student">الطالب</th>
+                      <th id="tbl-leader-level">المستوى</th>
+                      <th id="tbl-leader-points">النقاط</th>
+                    </tr>
+                  </thead>
+                  <tbody id="leaderboard-table-body">
+                    <!-- Injected leaderboard -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Points & Badges -->
+            <div style="display: flex; flex-direction: column; gap: 20px;">
+              <!-- Points box -->
+              <div class="custom-card" style="text-align: center; border-color: var(--gold);">
+                <div style="font-size: 3rem; margin-bottom: 10px;">⭐</div>
+                <h3 id="lbl-my-points-title">نقاطي الحالية</h3>
+                <div style="font-size: 2.5rem; font-weight: 900; color: var(--gold);" id="my-points-value">0</div>
+                <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;" id="lbl-my-points-desc">اكتمل الاختبارات والحضور لكسب المزيد!</p>
+              </div>
+
+              <!-- Badges earned -->
+              <div class="custom-card">
+                <h3 style="font-size: 0.95rem; font-weight: 800; margin-bottom: 16px;" id="lbl-my-badges-title">🥇 الأوسمة والإنجازات</h3>
+                <div class="achievements-grid" id="badges-container">
+                  <!-- Badges injected by JS -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===================================================== -->
+        <!-- ===== PANEL: REPORTS ===== -->
+        <!-- ===================================================== -->
+        <div class="panel" id="panel-reports">
+          <div class="card-title-bar" style="margin-bottom: 24px;">
+            <h2 id="lbl-reports-header">📊 تقارير الأداء والدراسة</h2>
+          </div>
+          <div class="custom-card table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr id="tbl-reports-head">
+                  <th>المادة / الحصة</th>
+                  <th>التاريخ</th>
+                  <th>الحضور</th>
+                  <th>الواجب الدراسي</th>
+                  <th>الدرجة</th>
+                  <th>ملاحظات المدرس</th>
+                </tr>
+              </thead>
+              <tbody id="reports-table-body">
+                <!-- Injected performance reports -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ===================================================== -->
+        <!-- ===== PANEL: USERS (Admin Only) ===== -->
+        <!-- ===================================================== -->
+        <div class="panel" id="panel-users">
+          <div class="card-title-bar" style="margin-bottom: 24px;">
+            <h2 id="lbl-users-header">👥 إدارة مستخدمين المنصة</h2>
+            <button class="btn btn-primary" id="btn-add-new-user">إضافة مستخدم جديد</button>
+          </div>
+          <div class="custom-card table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr id="tbl-users-head">
+                  <th>الاسم</th>
+                  <th>البريد الإلكتروني</th>
+                  <th>الدور</th>
+                  <th>الهاتف</th>
+                  <th>المستوى الدراسي</th>
+                  <th>الإجراءات</th>
+                </tr>
+              </thead>
+              <tbody id="users-table-body">
+                <!-- Injected users list -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ===================================================== -->
+        <!-- ===== PANEL: CONFIG (Admin Only) ===== -->
+        <!-- ===================================================== -->
+        <div class="panel" id="panel-config">
+          <div class="card-title-bar" style="margin-bottom: 24px;">
+            <h2 id="lbl-config-header">⚙️ إعدادات المنصة العامة</h2>
+          </div>
+          <div class="custom-card">
+            <form id="platform-config-form">
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label" for="cfg-site-name">اسم المنصة (العربية) *</label>
+                  <input type="text" id="cfg-site-name" class="form-input" value="منصة الأستاذ محمد سمير لتعليم الإنجليزية" required />
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="cfg-site-name-en">اسم المنصة (الإنجليزية) *</label>
+                  <input type="text" id="cfg-site-name-en" class="form-input" value="Mr. Mohamed Samir English Platform" required />
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label" for="cfg-phone">رقم الهاتف (الواتساب) *</label>
+                  <input type="text" id="cfg-phone" class="form-input" value="01121342026" required />
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="cfg-email">البريد الإلكتروني للدعم *</label>
+                  <input type="email" id="cfg-email" class="form-input" value="mr.mohamed@english.com" required />
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="cfg-welcome-msg">رسالة الترحيب الافتراضية</label>
+                <textarea id="cfg-welcome-msg" class="form-textarea">أهلاً بكم في منصتكم التعليمية المتميزة. نتمنى لكم تفوقاً دائماً!</textarea>
+              </div>
+              <button type="submit" class="btn btn-primary" id="btn-save-cfg">حفظ التغييرات</button>
+            </form>
+          </div>
+        </div>
+
+      </div>
+    </main>
+
+  </div>
+
+  <!-- ===== EXAM PLAYER MODAL ===== -->
+  <div id="exam-player-modal" style="display: none; position: fixed; inset: 0; background: rgba(6,14,31,0.95); z-index: 1000; align-items: center; justify-content: center; padding: 24px;">
+    <!-- Injected by js/exam.js -->
+  </div>
+
+  <!-- ===== ADD COURSE/LESSON MODAL ===== -->
+  <div id="course-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center; padding: 24px;">
+    <!-- Injected by js/app.js -->
+  </div>
+
+  <!-- ===== TOAST CONTAINER ===== -->
+  <div id="toast-container"></div>
+
+  <!-- ===== SCRIPTS ===== -->
+  <script src="js/main.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/ai-assistant.js"></script>
+</body>
+</html>

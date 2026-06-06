@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>استعراض المناهج والدروس | منصة الأستاذ محمد</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* Custom course player page styles */
+    .courses-wrapper {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .catalog-layout {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 32px;
+      margin-top: 40px;
+    }
+    @media (max-width: 768px) {
+      .catalog-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+    .filter-card {
+      background: var(--surface);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      position: sticky;
+      top: 100px;
+    }
+    .filter-group {
+      margin-bottom: 20px;
+    }
+    .filter-title {
+      font-size: 0.95rem;
+      font-weight: 800;
+      margin-bottom: 12px;
+      color: var(--text-muted);
+    }
+    .filter-checkbox-label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.88rem;
+      margin-bottom: 8px;
+      cursor: pointer;
+      color: var(--text-muted);
+      transition: var(--transition);
+    }
+    .filter-checkbox-label:hover {
+      color: var(--text);
+    }
+    .filter-checkbox-label input {
+      cursor: pointer;
+    }
+    /* Player layout screen style */
+    .player-layout {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 28px;
+    }
+    @media (max-width: 992px) {
+      .player-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+    .video-mock-container {
+      width: 100%;
+      aspect-ratio: 16/9;
+      background: #020712;
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow-lg);
+    }
+    .video-mock-img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.4;
+    }
+    .video-mock-overlay {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+    }
+    .video-mock-play-btn {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: var(--accent);
+      border: none;
+      font-size: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #0c1a3a;
+      cursor: pointer;
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.4);
+      transition: var(--transition);
+      margin: 0 auto 16px;
+    }
+    .video-mock-play-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 30px rgba(56, 189, 248, 0.6);
+    }
+    .video-controls {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 16px 24px;
+      background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+      z-index: 5;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .video-timeline {
+      position: absolute;
+      bottom: 50px;
+      left: 24px;
+      right: 24px;
+      height: 4px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 2px;
+      cursor: pointer;
+    }
+    .video-timeline-fill {
+      height: 100%;
+      background: var(--accent);
+      width: 0%;
+      position: relative;
+    }
+    .video-timeline-fill::after {
+      content: '';
+      position: absolute;
+      right: -4px;
+      top: -3px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #fff;
+    }
+    /* Playlist block */
+    .playlist-card {
+      background: var(--surface);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      height: 520px;
+      display: flex;
+      flex-direction: column;
+    }
+    .playlist-header {
+      font-size: 1.05rem;
+      font-weight: 800;
+      margin-bottom: 16px;
+      border-bottom: 1px solid var(--glass-border);
+      padding-bottom: 12px;
+    }
+    .playlist-items {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .playlist-item {
+      padding: 12px 14px;
+      background: var(--surface-2);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: var(--transition);
+    }
+    .playlist-item:hover, .playlist-item.active {
+      border-color: var(--accent);
+      background: rgba(56, 189, 248, 0.05);
+    }
+    .playlist-item.active {
+      color: var(--accent);
+    }
+    .playlist-item-check {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 1.5px solid var(--glass-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.65rem;
+      color: transparent;
+      flex-shrink: 0;
+    }
+    .playlist-item.watched .playlist-item-check {
+      border-color: var(--success);
+      background: var(--success);
+      color: #fff;
+    }
+    /* Resources widgets */
+    .resource-box {
+      margin-top: 24px;
+      padding: 20px;
+      background: var(--surface);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+    }
+    .resource-links {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 14px;
+      margin-top: 16px;
+    }
+    .resource-btn {
+      padding: 12px;
+      background: var(--surface-2);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      color: var(--text);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 700;
+      transition: var(--transition);
+    }
+    .resource-btn:hover {
+      border-color: var(--accent);
+      background: rgba(56, 189, 248, 0.08);
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+<body class="courses-wrapper">
+
+  <!-- ===== PARTICLES ===== -->
+  <canvas id="particles-canvas"></canvas>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <!-- ===== NAVBAR ===== -->
+  <nav class="navbar scrolled">
+    <div class="nav-container">
+      <a href="dashboard.html" class="nav-logo">
+        <div class="nav-logo-icon">🎓</div>
+        <div class="nav-logo-text">
+          <span class="nav-logo-name" style="color:var(--text)">Mr. Mohamed</span>
+          <span class="nav-logo-sub">English Platform</span>
+        </div>
+      </a>
+      
+      <div style="margin-right: auto; margin-left: 0; display: flex; gap: 8px;">
+        <a href="dashboard.html" class="btn btn-ghost" style="font-size: 0.82rem; padding: 8px 16px;" id="btn-back-dashboard-nav">لوحة التحكم</a>
+        <!-- Theme Toggle -->
+        <button class="theme-btn" id="theme-toggle">🌓</button>
+        <!-- Language Switcher -->
+        <button class="lang-btn" id="lang-toggle" data-lang="ar">EN</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ===== CORE CONTAINER ===== -->
+  <div class="container" style="flex: 1; padding-top: 100px; padding-bottom: 80px;">
+
+    <!-- ===================================================== -->
+    <!-- ===== VIEW 1: CATALOG VIEW ===== -->
+    <!-- ===================================================== -->
+    <div id="catalog-view">
+      <div class="section-header reveal" style="margin-bottom: 40px;">
+        <div class="section-badge"><span id="lbl-catalog-badge-icon">📚</span> <span id="lbl-catalog-badge-text">المناهج المتاحة</span></div>
+        <h1 class="section-title" id="lbl-catalog-title">مكتبة <span class="highlight">الدروس التعليمية</span></h1>
+        <p class="section-subtitle" id="lbl-catalog-desc">استعرض الكورسات المصممة خصيصاً لمرحلتك الدراسية بأسلوب تفاعلي رائع</p>
+      </div>
+
+      <div class="catalog-layout">
+        <!-- Sidebar Filters -->
+        <div class="reveal">
+          <div class="filter-card">
+            <div class="filter-group">
+              <div class="filter-title" id="lbl-filter-stages">المراحل الدراسية</div>
+              <label class="filter-checkbox-label">
+                <input type="checkbox" class="stage-filter" value="primary" checked>
+                <span id="lbl-chk-primary">🌱 المرحلة الابتدائية</span>
+              </label>
+              <label class="filter-checkbox-label">
+                <input type="checkbox" class="stage-filter" value="prep" checked>
+                <span id="lbl-chk-prep">📖 المرحلة الإعدادية</span>
+              </label>
+              <label class="filter-checkbox-label">
+                <input type="checkbox" class="stage-filter" value="secondary" checked>
+                <span id="lbl-chk-secondary">🎯 المرحلة الثانوية</span>
+              </label>
+              <label class="filter-checkbox-label">
+                <input type="checkbox" class="stage-filter" value="advanced" checked>
+                <span id="lbl-chk-advanced">🚀 جامعي ومتقدم</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Grid Results -->
+        <div class="reveal">
+          <div class="course-list-grid" id="catalog-grid-container">
+            <!-- Dynamic courses listed here -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================================================== -->
+    <!-- ===== VIEW 2: COURSE PLAYER VIEW ===== -->
+    <!-- ===================================================== -->
+    <div id="player-view" style="display: none;">
+      <!-- Player Header Info -->
+      <div style="margin-bottom: 28px;">
+        <button class="btn btn-ghost" style="padding: 8px 16px; margin-bottom: 16px;" id="btn-back-catalog">
+          <span id="lbl-arrow-back">←</span> <span id="lbl-back-to-catalog">العودة للمكتبة</span>
+        </button>
+        <h1 class="section-title" id="player-course-title" style="text-align: start; font-size: 1.8rem; line-height: 1.3;">شرح زمن المضارع البالغ Masterclass</h1>
+        <p style="color: var(--text-muted); margin-top: 4px;" id="player-course-grade">الصف الثالث الثانوي · الأستاذ محمد سمير</p>
+      </div>
+
+      <!-- Grid Layout -->
+      <div class="player-layout">
+        
+        <!-- Left: Media Player -->
+        <div>
+          <!-- Video Container -->
+          <div class="video-mock-container" id="video-wrapper">
+            <img src="" alt="Thumbnail" class="video-mock-img" id="player-video-thumb" />
+            
+            <div class="video-mock-overlay" id="video-overlay-play">
+              <button class="video-mock-play-btn" id="btn-mock-play-media">▶</button>
+              <h3 style="font-weight: 700; margin-bottom: 4px;" id="player-media-title">الدرس الأول: مقدمة وتمهيد</h3>
+              <p style="color: var(--text-muted); font-size: 0.82rem;" id="player-media-duration">⏱ 15 دقيقة</p>
+            </div>
+
+            <!-- Custom Controls -->
+            <div class="video-controls">
+              <button class="btn btn-ghost" style="padding: 6px 12px; font-size: 0.75rem; border-color: transparent;" id="btn-control-play-pause">▶ Play</button>
+              <div style="display: flex; gap: 14px; align-items: center;">
+                <span style="font-size: 0.72rem; color: var(--text-muted);" id="video-control-timer">00:00 / 15:00</span>
+                <button class="btn btn-ghost" style="padding: 4px 8px; font-size: 0.7rem; border-color:transparent;" id="btn-control-speed">1.0x</button>
+              </div>
+              <div class="video-timeline" id="video-control-seek">
+                <div class="video-timeline-fill" id="video-control-seek-fill"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Lesson descriptions -->
+          <div class="custom-card" style="margin-top: 24px;">
+            <h3 style="font-size: 1rem; font-weight: 800; margin-bottom: 12px;" id="lbl-lesson-desc-title">📝 وصف وشرح الدرس</h3>
+            <p style="color: var(--text-muted); line-height: 1.7; font-size: 0.9rem;" id="player-lesson-desc">
+              في هذا الدرس سنتعلم القواعد الأساسية لزمن المضارع، مع أمثلة عملية وكيفية النطق الصحيح لها في الجمل اليومية.
+            </p>
+          </div>
+
+          <!-- Resources Downloads -->
+          <div class="resource-box">
+            <h3 style="font-size: 1rem; font-weight: 800;" id="lbl-resources-title">📥 ملفات ومرفقات الدرس</h3>
+            <div class="resource-links">
+              <a href="#" class="resource-btn" onclick="showToast('📥 جاري تحميل ملخص الشرح PDF...','success')">
+                <span>📘</span> <span id="lbl-pdf-summary">كتاب الشرح وملخص القاعدة (PDF)</span>
+              </a>
+              <a href="#" class="resource-btn" onclick="showToast('📥 جاري تحميل ورقة الواجب PDF...','success')">
+                <span>📝</span> <span id="lbl-pdf-homework">استمارة واجب الدرس (PDF)</span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Playlist Items -->
+        <div>
+          <div class="playlist-card">
+            <div class="playlist-header" id="lbl-playlist-title">🎬 قائمة حصص الكورس</div>
+            <div class="playlist-items" id="player-playlist-container">
+              <!-- Playlist items injected here -->
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===== TOAST CONTAINER ===== -->
+  <div id="toast-container"></div>
+
+  <!-- ===== SCRIPTS ===== -->
+  <script src="js/main.js"></script>
+  <script src="js/courses.js"></script>
+</body>
+</html>

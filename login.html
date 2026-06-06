@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>بوابة الدخول | منصة الأستاذ محمد</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* Additional custom styles for login page */
+    .login-container {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 100px 24px 60px;
+      position: relative;
+      z-index: 1;
+    }
+    .login-card {
+      width: 100%;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+    .tabs-header {
+      display: flex;
+      border-bottom: 1px solid var(--glass-border);
+      margin-bottom: 28px;
+    }
+    .tab-btn {
+      flex: 1;
+      padding: 14px;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.05rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: var(--transition);
+      text-align: center;
+      border-bottom: 2px solid transparent;
+    }
+    .tab-btn:hover {
+      color: var(--accent);
+    }
+    .tab-btn.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+    .demo-accounts {
+      margin-top: 32px;
+      padding-top: 24px;
+      border-top: 1px dashed var(--glass-border);
+    }
+    .demo-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      text-align: center;
+    }
+    .demo-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+    .demo-btn {
+      padding: 10px;
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      color: var(--text-muted);
+      border-radius: var(--radius-sm);
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .demo-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(56,189,248,0.08);
+      transform: translateY(-2px);
+    }
+    [dir="ltr"] .login-logo {
+      flex-direction: row-reverse;
+    }
+    .back-home {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 20px;
+      transition: var(--transition);
+    }
+    .back-home:hover {
+      color: var(--accent);
+      transform: translateX(-4px);
+    }
+    [dir="ltr"] .back-home:hover {
+      transform: translateX(4px);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===== PARTICLES ===== -->
+  <canvas id="particles-canvas"></canvas>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <!-- ===== NAVBAR ===== -->
+  <nav class="navbar scrolled">
+    <div class="nav-container">
+      <a href="index.html" class="nav-logo">
+        <div class="nav-logo-icon">🎓</div>
+        <div class="nav-logo-text">
+          <span class="nav-logo-name">Mr. Mohamed</span>
+          <span class="nav-logo-sub">English Platform</span>
+        </div>
+      </a>
+      <div style="margin-right: auto; margin-left: 0; display: flex; gap: 8px;" id="nav-actions-auth">
+        <!-- Theme Toggle -->
+        <button class="theme-btn" id="theme-toggle" aria-label="تغيير المظهر">🌓</button>
+        <!-- Language Switcher -->
+        <button class="lang-btn" id="lang-toggle" data-lang="ar">EN</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ===== LOGIN CONTAINER ===== -->
+  <div class="login-container">
+    <div class="login-card">
+      <a href="index.html" class="back-home" id="btn-back-home">
+        <span>←</span> العودة للرئيسية
+      </a>
+
+      <div class="register-form-card">
+        <div class="tabs-header">
+          <button class="tab-btn active" id="tab-login-btn">تسجيل الدخول</button>
+          <button class="tab-btn" id="tab-register-btn">إنشاء حساب جديد</button>
+        </div>
+
+        <!-- LOGIN FORM -->
+        <form id="login-form">
+          <div class="form-group">
+            <label class="form-label" for="login-username" id="lbl-login-user">البريد الإلكتروني أو اسم المستخدم *</label>
+            <input type="text" id="login-username" class="form-input" required placeholder="example@email.com" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="login-password" id="lbl-login-pass">كلمة المرور *</label>
+            <input type="password" id="login-password" class="form-input" required placeholder="••••••••" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="login-role" id="lbl-login-role">تسجيل الدخول كـ *</label>
+            <select id="login-role" class="form-select" required>
+              <option value="student" selected>👨‍🎓 طالب (Student)</option>
+              <option value="teacher">👨‍🏫 مدرس (Teacher)</option>
+              <option value="parent">👩 ولي أمر (Parent)</option>
+              <option value="admin">🔑 مدير (Admin)</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary submit-btn" style="width:100%; justify-content:center; padding:16px; margin-top:10px;" id="btn-submit-login">
+            <span>🚀</span> دخول البوابة
+          </button>
+        </form>
+
+        <!-- REGISTER FORM -->
+        <form id="register-form-sec" style="display: none;">
+          <div class="form-group">
+            <label class="form-label" for="reg-name" id="lbl-reg-name">الاسم الكامل *</label>
+            <input type="text" id="reg-name" class="form-input" required placeholder="مثال: أحمد محمود" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="reg-email" id="lbl-reg-email">البريد الإلكتروني *</label>
+            <input type="email" id="reg-email" class="form-input" required placeholder="username@example.com" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="reg-password" id="lbl-reg-pass">كلمة المرور *</label>
+            <input type="password" id="reg-password" class="form-input" required placeholder="••••••••" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="reg-phone" id="lbl-reg-phone">رقم الهاتف *</label>
+            <input type="tel" id="reg-phone" class="form-input" required placeholder="01xxxxxxxxx" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="reg-role" id="lbl-reg-role">التسجيل كـ *</label>
+            <select id="reg-role" class="form-select" required>
+              <option value="student" selected>👨‍🎓 طالب (Student)</option>
+              <option value="parent">👩 ولي أمر (Parent)</option>
+            </select>
+          </div>
+          <div class="form-group" id="reg-student-grade-group">
+            <label class="form-label" for="reg-grade" id="lbl-reg-grade">المرحلة الدراسية *</label>
+            <select id="reg-grade" class="form-select">
+              <optgroup label="🌱 المرحلة الابتدائية">
+                <option value="primary-1">الصف الأول الابتدائي</option>
+                <option value="primary-2">الصف الثاني الابتدائي</option>
+                <option value="primary-3">الصف الثالث الابتدائي</option>
+                <option value="primary-4">الصف الرابع الابتدائي</option>
+                <option value="primary-5">الصف الخامس الابتدائي</option>
+                <option value="primary-6">الصف السادس الابتدائي</option>
+              </optgroup>
+              <optgroup label="📖 المرحلة الإعدادية">
+                <option value="prep-1">الصف الأول الإعدادي</option>
+                <option value="prep-2">الصف الثاني الإعدادي</option>
+                <option value="prep-3">الصف الثالث الإعدادي</option>
+              </optgroup>
+              <optgroup label="🎯 المرحلة الثانوية">
+                <option value="secondary-1">الصف الأول الثانوي</option>
+                <option value="secondary-2">الصف الثاني الثانوي</option>
+                <option value="secondary-3">الصف الثالث الثانوي</option>
+              </optgroup>
+              <optgroup label="🚀 متقدم / جامعي">
+                <option value="advanced-uni">طالب جامعي</option>
+                <option value="advanced-ielts">IELTS / TOEFL</option>
+                <option value="advanced-business">بيزنس انجليزي</option>
+              </optgroup>
+            </select>
+          </div>
+          <div class="form-group" id="reg-parent-child-group" style="display: none;">
+            <label class="form-label" for="reg-child-email" id="lbl-reg-child-email">البريد الإلكتروني للطالب (الابن) *</label>
+            <input type="email" id="reg-child-email" class="form-input" placeholder="student@email.com" />
+          </div>
+          <button type="submit" class="btn btn-primary submit-btn" style="width:100%; justify-content:center; padding:16px; margin-top:10px;" id="btn-submit-register">
+            <span>🚀</span> إنشاء حساب مجاني
+          </button>
+        </form>
+
+        <!-- DEMO ACCOUNTS QUICK-FILL -->
+        <div class="demo-accounts">
+          <div class="demo-title" id="demo-title-text">🔑 حسابات تجريبية سريعة (Demo Logins)</div>
+          <div class="demo-grid">
+            <button class="demo-btn" data-role="student" title="طالب تجريبي">
+              <span>👨‍🎓</span> طالب (Student)
+            </button>
+            <button class="demo-btn" data-role="teacher" title="أستاذ محمد">
+              <span>👨‍🏫</span> مدرس (Teacher)
+            </button>
+            <button class="demo-btn" data-role="parent" title="ولي أمر تجريبي">
+              <span>👩</span> ولي أمر (Parent)
+            </button>
+            <button class="demo-btn" data-role="admin" title="مدير المنصة">
+              <span>🔑</span> مدير (Admin)
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== TOAST CONTAINER ===== -->
+  <div id="toast-container"></div>
+
+  <!-- ===== SCRIPTS ===== -->
+  <script src="js/main.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    // Local page adjustments for tab swapping and quick fill
+    document.addEventListener('DOMContentLoaded', () => {
+      const tabLogin = document.getElementById('tab-login-btn');
+      const tabRegister = document.getElementById('tab-register-btn');
+      const loginForm = document.getElementById('login-form');
+      const registerForm = document.getElementById('register-form-sec');
+
+      // Check if URL parameters request register first
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('register') === 'true') {
+        tabRegister.click();
+      }
+
+      tabLogin.addEventListener('click', () => {
+        tabLogin.classList.add('active');
+        tabRegister.classList.remove('active');
+        loginForm.style.display = 'block';
+        registerForm.style.display = 'none';
+      });
+
+      tabRegister.addEventListener('click', () => {
+        tabRegister.classList.add('active');
+        tabLogin.classList.remove('active');
+        registerForm.style.display = 'block';
+        loginForm.style.display = 'none';
+      });
+
+      // Show child email field only for parent register
+      const regRole = document.getElementById('reg-role');
+      const childEmailGroup = document.getElementById('reg-parent-child-group');
+      const gradeGroup = document.getElementById('reg-student-grade-group');
+      
+      regRole.addEventListener('change', () => {
+        if (regRole.value === 'parent') {
+          childEmailGroup.style.display = 'block';
+          document.getElementById('reg-child-email').required = true;
+          gradeGroup.style.display = 'none';
+        } else {
+          childEmailGroup.style.display = 'none';
+          document.getElementById('reg-child-email').required = false;
+          gradeGroup.style.display = 'block';
+        }
+      });
+
+      // Quick Demo logins click handlers
+      document.querySelectorAll('.demo-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const role = btn.dataset.role;
+          tabLogin.click();
+          
+          const usernameInput = document.getElementById('login-username');
+          const passwordInput = document.getElementById('login-password');
+          const roleSelect = document.getElementById('login-role');
+          
+          roleSelect.value = role;
+          
+          if (role === 'teacher') {
+            usernameInput.value = 'teacher@samir.com';
+            passwordInput.value = 'teacher123';
+          } else if (role === 'admin') {
+            usernameInput.value = 'admin@samir.com';
+            passwordInput.value = 'admin123';
+          } else if (role === 'parent') {
+            usernameInput.value = 'parent@samir.com';
+            passwordInput.value = 'parent123';
+          } else {
+            usernameInput.value = 'student@samir.com';
+            passwordInput.value = 'student123';
+          }
+
+          showToast('✅ تم ملء بيانات الحساب التجريبي!', 'success');
+        });
+      });
+    });
+  </script>
+</body>
+</html>

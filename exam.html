@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>محرك الاختبارات التفاعلي | منصة الأستاذ محمد</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* Custom exam page styling */
+    .exam-wrapper {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .exam-header {
+      height: 70px;
+      background: rgba(6, 14, 31, 0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--glass-border);
+      padding: 0 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    [data-theme="light"] .exam-header {
+      background: rgba(240, 247, 255, 0.95);
+    }
+    .exam-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+    }
+    .timer-widget {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 16px;
+      background: rgba(239, 68, 68, 0.08);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      border-radius: var(--radius-sm);
+      color: var(--danger);
+      font-weight: 700;
+    }
+    .timer-widget.warning {
+      animation: pulseAlert 1s infinite alternate;
+    }
+    @keyframes pulseAlert {
+      from { box-shadow: 0 0 0 rgba(239, 68, 68, 0); }
+      to { box-shadow: 0 0 15px rgba(239, 68, 68, 0.5); }
+    }
+    .exam-container {
+      flex: 1;
+      max-width: 800px;
+      width: 100%;
+      margin: 40px auto;
+      padding: 0 24px 60px;
+    }
+    .exam-card {
+      background: var(--surface);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      padding: 36px;
+      position: relative;
+    }
+    .question-title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+    .options-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-bottom: 32px;
+    }
+    .option-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px 20px;
+      background: var(--surface-2);
+      border: 1.5px solid var(--glass-border);
+      border-radius: var(--radius);
+      cursor: pointer;
+      font-size: 0.95rem;
+      font-weight: 600;
+      transition: var(--transition);
+    }
+    .option-item:hover {
+      border-color: var(--accent);
+      background: rgba(56, 189, 248, 0.04);
+      transform: translateX(-4px);
+    }
+    [dir="ltr"] .option-item:hover {
+      transform: translateX(4px);
+    }
+    .option-item.selected {
+      border-color: var(--accent);
+      background: rgba(56, 189, 248, 0.08);
+      color: var(--accent);
+    }
+    .option-badge {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .option-item.selected .option-badge {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #0c1a3a;
+    }
+    .progress-strip {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+    .progress-bar-wrap {
+      flex: 1;
+      height: 6px;
+      background: var(--surface-2);
+      border-radius: var(--radius-full);
+      margin: 0 16px;
+      overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: var(--accent);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+    .results-card {
+      text-align: center;
+      animation: zoomIn 0.4s ease;
+    }
+    @keyframes zoomIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .results-score-circle {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      border: 8px solid var(--glass-border);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 24px auto;
+    }
+    .results-score-value {
+      font-size: 2.2rem;
+      font-weight: 900;
+      color: var(--accent);
+      line-height: 1;
+    }
+    .results-score-label {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+    /* Hidden canvas for certificate exporting */
+    #certificate-canvas {
+      display: none;
+    }
+    .review-item {
+      padding: 16px;
+      border-bottom: 1px solid var(--glass-border);
+      text-align: start;
+    }
+    .review-q {
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .review-ans {
+      font-size: 0.85rem;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .review-ans.correct { color: var(--success); }
+    .review-ans.wrong { color: var(--danger); }
+  </style>
+</head>
+<body class="exam-wrapper">
+
+  <!-- ===== PARTICLES ===== -->
+  <canvas id="particles-canvas"></canvas>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <!-- ===== HEADER ===== -->
+  <header class="exam-header">
+    <a href="dashboard.html" class="exam-logo">
+      <div class="sidebar-logo-icon">🎓</div>
+      <div class="sidebar-logo-text">
+        <span class="sidebar-logo-name" style="color:var(--text)">Mr. Mohamed</span>
+        <span class="sidebar-logo-sub">English Platform</span>
+      </div>
+    </a>
+    
+    <!-- Timer -->
+    <div class="timer-widget" id="exam-timer-widget">
+      <span>⏱</span>
+      <span id="exam-timer-value">00:00</span>
+    </div>
+
+    <!-- Actions -->
+    <div style="display:flex;gap:12px;">
+      <!-- Theme Toggle -->
+      <button class="theme-btn" id="theme-toggle">🌓</button>
+      <!-- Language Switcher -->
+      <button class="lang-btn" id="lang-toggle" data-lang="ar">EN</button>
+    </div>
+  </header>
+
+  <!-- ===== CONTAINER ===== -->
+  <div class="exam-container">
+    
+    <!-- QUESTION PANEL -->
+    <div class="exam-card" id="question-panel">
+      <!-- Progress Bar -->
+      <div class="progress-strip">
+        <span id="lbl-question-count">سؤال 1 من 10</span>
+        <div class="progress-bar-wrap">
+          <div class="progress-bar-fill" id="exam-progress-bar"></div>
+        </div>
+        <span id="lbl-percent-complete">10%</span>
+      </div>
+
+      <!-- Question Text -->
+      <h2 class="question-title" id="question-text-value">جاري تحميل الأسئلة...</h2>
+
+      <!-- Options -->
+      <div class="options-list" id="question-options-container">
+        <!-- Injected option buttons -->
+      </div>
+
+      <!-- Actions -->
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <button class="btn btn-ghost" id="btn-skip-q">تخطي السؤال</button>
+        <button class="btn btn-primary" id="btn-next-q">التالي <span>←</span></button>
+      </div>
+    </div>
+
+    <!-- RESULTS PANEL -->
+    <div class="exam-card results-card" id="results-panel" style="display: none;">
+      <span style="font-size:4rem;" id="results-emoji">🏆</span>
+      <h2 class="section-title" id="results-title-text" style="margin-top:12px; margin-bottom:8px;">تهانينا، لقد نجحت!</h2>
+      <p style="color:var(--text-muted);" id="results-desc-text">أداء ممتاز ومستوى رائع في اختبار اليوم.</p>
+
+      <div class="results-score-circle" id="score-circle-color">
+        <span class="results-score-value" id="results-score-pct">90%</span>
+        <span class="results-score-label" id="results-score-label-text">الدرجة النهائية</span>
+      </div>
+
+      <!-- Action buttons -->
+      <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-bottom:40px;">
+        <a href="dashboard.html" class="btn btn-ghost" id="btn-back-dash">العودة للوحة التحكم</a>
+        <button class="btn btn-gold" id="btn-download-cert" style="display: none;">🎓 تحميل شهادة التفوق</button>
+      </div>
+
+      <!-- Review Section -->
+      <div style="text-align:start; border-top:1px solid var(--glass-border); padding-top:32px;">
+        <h3 style="font-size:1.1rem; font-weight:800; margin-bottom:20px;" id="lbl-review-title">📝 مراجعة إجاباتك</h3>
+        <div id="exam-review-container">
+          <!-- Injected review list -->
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Hidden Canvas for drawing Certificate -->
+  <canvas id="certificate-canvas" width="842" height="595"></canvas>
+
+  <!-- ===== TOAST CONTAINER ===== -->
+  <div id="toast-container"></div>
+
+  <!-- ===== SCRIPTS ===== -->
+  <script src="js/main.js"></script>
+  <script src="js/exam.js"></script>
+</body>
+</html>
